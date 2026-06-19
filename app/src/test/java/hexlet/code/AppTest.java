@@ -1,15 +1,34 @@
 package hexlet.code;
 
-import io.javalin.Javalin;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AppTest {
     @Test
-    void getAppReturnsJavalinInstance() {
+    void rootRouteRendersHomePage() throws Exception {
         var app = App.getApp();
+        app.start(0);
 
-        assertInstanceOf(Javalin.class, app);
+        try {
+            var client = HttpClient.newHttpClient();
+            var request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + app.port() + "/"))
+                .GET()
+                .build();
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            assertTrue(response.body().contains("Анализатор страниц"));
+            assertTrue(response.body().contains("Бесплатно проверяйте сайты на SEO пригодность"));
+            assertTrue(response.body().contains("https://cdn.jsdelivr.net/npm/bootstrap"));
+            assertTrue(response.body().contains("action=\"/urls\""));
+        } finally {
+            app.stop();
+        }
     }
 }
