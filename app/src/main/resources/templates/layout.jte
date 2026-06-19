@@ -10,8 +10,6 @@
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      integrity="sha384-QWTKZyjpPEjISv5WaRU9Oer+R4lv3a2B6jizoU8yWh5yYDVZ13zZ1r7M"
-      crossorigin="anonymous"
     >
   </head>
   <body>
