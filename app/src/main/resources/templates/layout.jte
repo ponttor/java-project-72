@@ -1,5 +1,8 @@
 @import gg.jte.Content
+@import hexlet.code.dto.BasePage
+@import hexlet.code.NamedRoutes
 @param Content content
+@param BasePage page = null
 
 <!doctype html>
 <html lang="ru">
@@ -15,10 +18,15 @@
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <div class="container">
-        <a class="navbar-brand" href="/">Анализатор страниц</a>
+        <a class="navbar-brand" href="${NamedRoutes.rootPath()}">Анализатор страниц</a>
       </div>
     </nav>
     <main class="container py-5">
+      @if (page != null && page.getFlash() != null && !page.getFlash().isBlank())
+        <div class="alert alert-${page.getFlashType()}" role="alert">
+          ${page.getFlash()}
+        </div>
+      @endif
       ${content}
     </main>
   </body>

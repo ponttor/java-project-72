@@ -3,3 +3,5 @@ CREATE TABLE IF NOT EXISTS urls (
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS urls_name_index ON urls (name);

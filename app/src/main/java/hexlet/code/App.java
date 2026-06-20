@@ -5,6 +5,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.ResourceCodeResolver;
+import hexlet.code.controller.RootController;
+import hexlet.code.controller.UrlsController;
 import hexlet.code.repository.BaseRepository;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinJte;
@@ -18,7 +20,10 @@ public class App {
 
     private static HikariDataSource createDataSource() {
         var config = new HikariConfig();
-        var jdbcDatabaseUrl = System.getenv().getOrDefault("JDBC_DATABASE_URL", DEFAULT_DATABASE_URL);
+        var jdbcDatabaseUrl = System.getProperty(
+            "JDBC_DATABASE_URL",
+            System.getenv().getOrDefault("JDBC_DATABASE_URL", DEFAULT_DATABASE_URL)
+        );
         config.setJdbcUrl(jdbcDatabaseUrl);
         return new HikariDataSource(config);
     }
@@ -33,7 +38,11 @@ public class App {
              var connection = dataSource.getConnection();
              var statement = connection.createStatement()) {
             var sql = new String(schema.readAllBytes(), StandardCharsets.UTF_8);
-            statement.execute(sql);
+            for (var query : sql.split(";")) {
+                if (!query.isBlank()) {
+                    statement.execute(query);
+                }
+            }
         } catch (SQLException | IOException e) {
             throw new RuntimeException("Failed to initialize database", e);
         }
@@ -55,7 +64,10 @@ public class App {
             config.bundledPlugins.enableDevLogging();
             config.events.serverStopped(dataSource::close);
             config.fileRenderer(new JavalinJte(createTemplateEngine()));
-            config.routes.get("/", ctx -> ctx.render("index.jte"));
+            config.routes.get(NamedRoutes.rootPath(), RootController::index);
+            config.routes.get(NamedRoutes.urlsPath(), UrlsController::index);
+            config.routes.post(NamedRoutes.urlsPath(), UrlsController::create);
+            config.routes.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
         });
         return app;
     }
